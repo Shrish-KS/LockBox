@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lockbox/screens/Authentication/register.dart';
 import 'package:lockbox/screens/onboarding/onboard.dart';
 import 'package:lockbox/screens/Authentication/signin.dart';
 
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SignIn(),
+      home: Register(),
     );
   }
 }

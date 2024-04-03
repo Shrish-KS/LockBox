@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lockbox/screens/Authentication/register.dart';
+import 'package:lockbox/screens/onboarding/onboard.dart';
 import 'package:lockbox/shared/constants.dart';
 
 class SignIn extends StatefulWidget {
@@ -61,17 +63,18 @@ class _SignInState extends State<SignIn> {
                           Container(
                             child: TextFormField(
                               decoration: textinputdecoration.copyWith(hintText: "Email/Phone",prefixIcon: Icon(Icons.person),label: Text("Email/Phone")),
-                              validator: (val) => val!.length==0?"Email cant be empty":null,
+                              validator: (val) => val!.length==0?"Email/phone cant be empty":null,
                               onChanged: (val) =>{
                                 email=val
                               },
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
+                                color: Colors.brown[600],
                                 letterSpacing: 0.5,
                               ),
                             ),
                           ),
-                          SizedBox(height: 20,),
+                          SizedBox(height: 30,),
                           Container(
                             child: TextFormField(
                               decoration: textinputdecoration.copyWith(hintText: "Password",prefixIcon: Icon(Icons.key),label: Text("Password")),
@@ -80,20 +83,27 @@ class _SignInState extends State<SignIn> {
                                 pass=val
                               },
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
+                                color: Colors.brown[600],
                                 letterSpacing: 0.5,
                               ),
                             ),
                           ),
+                          SizedBox(height: 20,),
                           Container(
                             width: 150,
                             child: TextButton(
                               style: ButtonStyle(
-
+                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
                                 side: MaterialStatePropertyAll(BorderSide()),
                                 backgroundColor: MaterialStatePropertyAll(Color.fromRGBO(
                                     90, 1, 91, 1.0)),
-                                foregroundColor: MaterialStatePropertyAll(Colors.red),
+                                foregroundColor: MaterialStatePropertyAll(Colors.white),
+                                textStyle: MaterialStatePropertyAll(TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.7
+                                )),
                               ),
                                 onPressed: (){
                                   if(_formkey.currentState!.validate()){
@@ -103,7 +113,32 @@ class _SignInState extends State<SignIn> {
                                 },
                                 child: Text("Login")
                             ),
-                          )
+                          ),
+                          Container(
+                            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text("Dont have an account  "),
+                                InkWell(
+                                  child: Text(
+                                      "Register",
+                                    style: TextStyle(
+                                      color: Colors.red[700],
+                                    ),
+                                  ),
+                                  onTap: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) =>  Register()),
+                                    );
+                                  },
+                                )
+                              ],
+                            ),
+
+                          ),
                         ],
                       ),
                     ),

@@ -18,6 +18,13 @@ final textinputdecoration = InputDecoration(
         width: 2,
       )
   ),
+  errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(20)),
+      borderSide: BorderSide(
+        color: Colors.red[300]??Colors.red,
+        width: 2,
+      )
+  ),
   enabledBorder: OutlineInputBorder(
     borderRadius: BorderRadius.all(Radius.circular(20)),
       borderSide: BorderSide(
