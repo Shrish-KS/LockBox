@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:lockbox/screens/Authentication/signin.dart';
 import 'package:lockbox/screens/onboarding/page1.dart';
 import 'package:lockbox/screens/onboarding/page2.dart';
 import 'package:lockbox/screens/onboarding/page3.dart';
@@ -90,7 +91,10 @@ class _OnboardState extends State<Onboard> {
                     overlayColor: MaterialStatePropertyAll(Colors.white),
                   ),
                   onPressed: () async{
-
+                    Navigator.pushReplacement(
+                        context,
+                      MaterialPageRoute(builder: (context) =>  SignIn()),
+                    );
                   },
                   child: Container(
                     width: 165,
