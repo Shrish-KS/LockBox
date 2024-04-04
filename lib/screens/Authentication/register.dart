@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:lockbox/screens/Authentication/signin.dart';
+import 'package:lockbox/screens/Home/home.dart';
 import 'package:lockbox/screens/loading.dart';
 import 'package:lockbox/screens/onboarding/onboard.dart';
 import 'package:lockbox/shared/constants.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:lockbox/services/auth.dart';
 
 class Register extends StatefulWidget {
   const Register({super.key});
@@ -19,6 +21,7 @@ class _RegisterState extends State<Register> {
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   final _formFieldKey = GlobalKey<FormFieldState>();
+  Authenticate _auth = Authenticate();
   String email="";
   String pass="";
   String phone="";
@@ -204,7 +207,7 @@ class _RegisterState extends State<Register> {
                                           letterSpacing: 0.7
                                       )),
                                     ),
-                                    onPressed: (){
+                                    onPressed: () async{
                                       if( _formkey.currentState!.validate()){
                                         if(phone.length<10){
                                           setState(() {
@@ -215,39 +218,78 @@ class _RegisterState extends State<Register> {
                                           setState(() {
                                             error="";
                                           });
-                                          QuickAlert.show(
-                                              context: context,
-                                              type: QuickAlertType.custom,
-                                              customAsset: 'assets/namealert.png',
-                                              title: "Enter Your Name",
-                                              confirmBtnColor: Color.fromRGBO(90, 1, 91, 1.0),
-                                              confirmBtnText: "Update",
-                                              confirmBtnTextStyle: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w700,
-                                                  letterSpacing: 0.7,
-                                                  color: Colors.white
-                                              ),
-                                              widget: Container(
-                                                padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                                                child: TextFormField(
-                                                  decoration: textinputdecoration.copyWith(label: Text("Display Name"),hintText: "Display Name",prefixIcon: Icon(Icons.account_circle_outlined)),
-                                                  key: _formFieldKey,
-                                                  validator: (val)=>(val==null || val!.length<3)?"Enter a Valid Name":null,
-                                                  onChanged: (val){
-                                                    name=val;
-                                                  },
+                                          dynamic result = await _auth.registerwithemailpass(email,pass);
+                                          if(result=="Old Email"){
+                                            QuickAlert.show(
+                                                context: context,
+                                                type: QuickAlertType.custom,
+                                                title: "Old User?",
+                                                widget: Text("This email is already registered with us. Do you want to Sign In"),
+                                                showCancelBtn: true,
+                                                confirmBtnText: "Sign In",
+                                                confirmBtnColor: Color.fromRGBO(90, 1, 91, 1.0),
+                                                confirmBtnTextStyle: TextStyle(
+                                                    color: Colors.white
                                                 ),
-                                              ),
-                                              onConfirmBtnTap: (){
-                                                if(_formFieldKey.currentState!.validate()){
-                                                  print(name);
-                                                  Navigator.pop(context);
+                                                onConfirmBtnTap: (){
+                                                  Navigator.pushReplacement(
+                                                    context,
+                                                    MaterialPageRoute(builder: (context) =>  SignIn()),
+                                                  );
                                                 }
-                                              },
-                                              showCancelBtn: false,
-                                              disableBackBtn: true
-                                          );
+                                            );
+                                          }
+                                          else if(result is String){
+                                            setState(() {
+                                              error=result;
+                                            });
+                                          }
+                                          else {
+                                            QuickAlert.show(
+                                                context: context,
+                                                type: QuickAlertType.custom,
+                                                customAsset: 'assets/namealert.png',
+                                                title: "Enter Your Name",
+                                                confirmBtnColor: Color.fromRGBO(
+                                                    90, 1, 91, 1.0),
+                                                confirmBtnText: "Update",
+                                                confirmBtnTextStyle: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w700,
+                                                    letterSpacing: 0.7,
+                                                    color: Colors.white
+                                                ),
+                                                widget: Container(
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      0, 20, 0, 0),
+                                                  child: TextFormField(
+                                                    decoration: textinputdecoration
+                                                        .copyWith(label: Text(
+                                                        "Display Name"),
+                                                        hintText: "Display Name",
+                                                        prefixIcon: Icon(Icons
+                                                            .account_circle_outlined)),
+                                                    key: _formFieldKey,
+                                                    validator: (val) =>
+                                                    (val == null ||
+                                                        val!.length < 3)
+                                                        ? "Enter a Valid Name"
+                                                        : null,
+                                                    onChanged: (val) {
+                                                      name = val;
+                                                    },
+                                                  ),
+                                                ),
+                                                onConfirmBtnTap: () {
+                                                  if (_formFieldKey.currentState!.validate()) {
+                                                    _auth.updatename(name, result);
+                                                    Navigator.push(context, MaterialPageRoute(builder: (context) =>  MainPage()),);
+                                                  }
+                                                },
+                                                showCancelBtn: false,
+                                                disableBackBtn: true
+                                            );
+                                          }
                                           print(name);
                                         }
                                       }

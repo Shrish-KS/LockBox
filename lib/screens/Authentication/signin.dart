@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lockbox/screens/Authentication/register.dart';
+import 'package:lockbox/screens/Home/home.dart';
 import 'package:lockbox/screens/onboarding/onboard.dart';
 import 'package:lockbox/shared/constants.dart';
 import 'package:lockbox/services/auth.dart';
+import 'package:quickalert/quickalert.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -121,8 +123,7 @@ class _SignInState extends State<SignIn> {
                               style: ButtonStyle(
                                 shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
                                 side: MaterialStatePropertyAll(BorderSide()),
-                                backgroundColor: MaterialStatePropertyAll(Color.fromRGBO(
-                                    90, 1, 91, 1.0)),
+                                backgroundColor: MaterialStatePropertyAll(Color.fromRGBO(90, 1, 91, 1.0)),
                                 foregroundColor: MaterialStatePropertyAll(Colors.white),
                                 textStyle: MaterialStatePropertyAll(TextStyle(
                                   fontSize: 18,
@@ -132,7 +133,38 @@ class _SignInState extends State<SignIn> {
                               ),
                                 onPressed: () async{
                                   if(_formkey.currentState!.validate()){
-                                    await _auth.signinwithemailpass(email,pass);
+                                    dynamic result=await _auth.signinwithemailpass(email,pass);
+                                    if(result=="New email"){
+                                      QuickAlert.show(
+                                        context: context,
+                                        type: QuickAlertType.custom,
+                                        title: "Wrong Credentials",
+                                        widget: Text("This email is not registered with us. Do you want to register"),
+                                        showCancelBtn: true,
+                                        confirmBtnText: "Register",
+                                        confirmBtnColor: Color.fromRGBO(90, 1, 91, 1.0),
+                                        confirmBtnTextStyle: TextStyle(
+                                          color: Colors.white
+                                        ),
+                                        onConfirmBtnTap: (){
+                                          Navigator.pushReplacement(
+                                              context,
+                                            MaterialPageRoute(builder: (context) =>  Register()),
+                                          );
+                                        }
+                                      );
+                                    }
+                                    else if(result is String){
+                                      setState(() {
+                                        error=result;
+                                      });
+                                    }
+                                    else{
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) =>  MainPage()),
+                                      );
+                                    }
                                   }
                                 },
                                 child: Text("Login")
