@@ -1,9 +1,13 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:lockbox/screens/Authentication/register.dart';
 import 'package:lockbox/screens/onboarding/onboard.dart';
 import 'package:lockbox/screens/Authentication/signin.dart';
+import 'package:lockbox/screens/loading.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 

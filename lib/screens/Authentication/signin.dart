@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lockbox/screens/Authentication/register.dart';
 import 'package:lockbox/screens/onboarding/onboard.dart';
 import 'package:lockbox/shared/constants.dart';
+import 'package:lockbox/services/auth.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -12,9 +13,13 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
 
+  final _auth = Authenticate();
+
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   String email="";
   String pass="";
+  bool _passwordVisible =false;
+  String error="";
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +82,19 @@ class _SignInState extends State<SignIn> {
                           SizedBox(height: 30,),
                           Container(
                             child: TextFormField(
-                              decoration: textinputdecoration.copyWith(hintText: "Password",prefixIcon: Icon(Icons.key),label: Text("Password")),
+                              obscureText: !_passwordVisible,
+                              decoration: textinputdecoration.copyWith(hintText: "Password",prefixIcon: Icon(Icons.key),label: Text("Password"),suffixIcon: IconButton(
+                                icon: Icon(
+                                  _passwordVisible
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _passwordVisible = !_passwordVisible;
+                                  });
+                                },
+                              ),),
                               validator: (val) => val!.length<6?"Password should be atleast 6 charecters":null,
                               onChanged: (val) =>{
                                 pass=val
@@ -89,7 +106,15 @@ class _SignInState extends State<SignIn> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 20,),
+                          SizedBox(height: 15,),
+                          Text(
+                            error,
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 17
+                            ),
+                          ),
+                          (error.length!=0)?SizedBox(height: 10,):Container(),
                           Container(
                             width: 150,
                             child: TextButton(
@@ -105,10 +130,9 @@ class _SignInState extends State<SignIn> {
                                   letterSpacing: 0.7
                                 )),
                               ),
-                                onPressed: (){
+                                onPressed: () async{
                                   if(_formkey.currentState!.validate()){
-                                    print(email);
-                                    print(pass);
+                                    await _auth.signinwithemailpass(email,pass);
                                   }
                                 },
                                 child: Text("Login")

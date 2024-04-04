@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:lockbox/screens/Authentication/signin.dart';
+import 'package:lockbox/screens/loading.dart';
 import 'package:lockbox/screens/onboarding/onboard.dart';
 import 'package:lockbox/shared/constants.dart';
 import 'package:quickalert/quickalert.dart';
@@ -22,16 +23,16 @@ class _RegisterState extends State<Register> {
   String pass="";
   String phone="";
   String checkpass="";
-  bool error=false;
-  String errormessage="";
+  String error="";
   DateTime dob=DateTime.now();
   String name="";
-  String finalname="";
-
+  bool loading=false;
+  bool _passwordVisible=false;
+  bool _passwordVisible2=false;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
+      child: loading?Loading():Scaffold(
           body: Container(
               alignment: Alignment.center,
               decoration: BoxDecoration(
@@ -121,7 +122,19 @@ class _RegisterState extends State<Register> {
                               SizedBox(height: 20,),
                               Container(
                                 child: TextFormField(
-                                  decoration: textinputdecoration.copyWith(hintText: "Password",prefixIcon: Icon(Icons.key),label: Text("Password")),
+                                  obscureText: !_passwordVisible,
+                                  decoration: textinputdecoration.copyWith(hintText: "Password",prefixIcon: Icon(Icons.key),label: Text("Password"),suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _passwordVisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _passwordVisible = !_passwordVisible;
+                                      });
+                                    },
+                                  ),),
                                   validator: (val) => val!.length<6?"Password should be atleast 6 charecters":null,
                                   onChanged: (val) =>{
                                     pass=val
@@ -136,7 +149,19 @@ class _RegisterState extends State<Register> {
                               SizedBox(height: 20,),
                               Container(
                                 child: TextFormField(
-                                  decoration: textinputdecoration.copyWith(hintText: "Password",prefixIcon: Icon(Icons.key),label: Text("Password")),
+                                  obscureText: !_passwordVisible2,
+                                  decoration: textinputdecoration.copyWith(hintText: "Confirm Password",prefixIcon: Icon(Icons.key),label: Text("Confirm Password"),suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _passwordVisible2
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _passwordVisible2 = !_passwordVisible2;
+                                      });
+                                    },
+                                  ),),
                                   validator: (val){
                                     if(val==null || val.length<6){
                                       return "Password should be atleast 6 charecters";
@@ -158,13 +183,13 @@ class _RegisterState extends State<Register> {
                               ),
                               SizedBox(height: 15,),
                               Text(
-                                errormessage,
+                                error,
                                 style: TextStyle(
                                   color: Colors.red,
                                   fontSize: 17
                                 ),
                               ),
-                              error?SizedBox(height: 10,):Container(),
+                              error.length!=0?SizedBox(height: 10,):Container(),
                               Container(
                                 width: 150,
                                 child: TextButton(
@@ -179,63 +204,55 @@ class _RegisterState extends State<Register> {
                                           letterSpacing: 0.7
                                       )),
                                     ),
-                                    onPressed: () {
-                                      QuickAlert.show(
-                                        context: context,
-                                        type: QuickAlertType.custom,
-                                        customAsset: 'assets/namealert.png',
-                                        title: "Enter Your Name",
-                                        confirmBtnColor: Color.fromRGBO(90, 1, 91, 1.0),
-                                        confirmBtnText: "Update",
-                                        confirmBtnTextStyle: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: 0.7,
-                                            color: Colors.white
-                                        ),
-                                        widget: Container(
-                                          padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                                          child: TextFormField(
-                                            decoration: textinputdecoration.copyWith(label: Text("Display Name"),hintText: "Display Name",prefixIcon: Icon(Icons.account_circle_outlined)),
-                                            key: _formFieldKey,
-                                            validator: (val)=>(val==null || val!.length<3)?"Enter a Valid Name":null,
-                                            onChanged: (val){
-                                              name=val;
-                                            },
-                                          ),
-                                        ),
-                                        onConfirmBtnTap: (){
-                                          if(_formFieldKey.currentState!.validate()){
-                                            finalname=name;
-                                            print(finalname);
-                                          }
-                                        },
-                                        showCancelBtn: false,
-                                        disableBackBtn: true
-                                      );
-                                      while(finalname==""){
-                                        ;
-                                      }
+                                    onPressed: (){
                                       if( _formkey.currentState!.validate()){
                                         if(phone.length<10){
                                           setState(() {
-                                            error=true;
-                                            errormessage="Enter Valid Mobile Number";
+                                            error="Enter Valid Mobile Number";
                                           });
                                         }
                                         else{
                                           setState(() {
-                                            error=false;
-                                            errormessage="";
+                                            error="";
                                           });
+                                          QuickAlert.show(
+                                              context: context,
+                                              type: QuickAlertType.custom,
+                                              customAsset: 'assets/namealert.png',
+                                              title: "Enter Your Name",
+                                              confirmBtnColor: Color.fromRGBO(90, 1, 91, 1.0),
+                                              confirmBtnText: "Update",
+                                              confirmBtnTextStyle: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700,
+                                                  letterSpacing: 0.7,
+                                                  color: Colors.white
+                                              ),
+                                              widget: Container(
+                                                padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                                                child: TextFormField(
+                                                  decoration: textinputdecoration.copyWith(label: Text("Display Name"),hintText: "Display Name",prefixIcon: Icon(Icons.account_circle_outlined)),
+                                                  key: _formFieldKey,
+                                                  validator: (val)=>(val==null || val!.length<3)?"Enter a Valid Name":null,
+                                                  onChanged: (val){
+                                                    name=val;
+                                                  },
+                                                ),
+                                              ),
+                                              onConfirmBtnTap: (){
+                                                if(_formFieldKey.currentState!.validate()){
+                                                  print(name);
+                                                  Navigator.pop(context);
+                                                }
+                                              },
+                                              showCancelBtn: false,
+                                              disableBackBtn: true
+                                          );
+                                          print(name);
                                         }
-                                        print(email);
-                                        print(pass);
-                                        print(phone);
-                                        print(checkpass);
-                                        print(dob);
                                       }
                                     },
+
                                     child: Text("Register")
                                 ),
                               ),
@@ -254,7 +271,7 @@ class _RegisterState extends State<Register> {
                                         ),
                                       ),
                                       onTap: (){
-                                        Navigator.push(
+                                        Navigator.pushReplacement(
                                           context,
                                           MaterialPageRoute(builder: (context) =>  SignIn()),
                                         );

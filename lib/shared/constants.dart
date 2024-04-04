@@ -11,6 +11,10 @@ final textinputdecoration = InputDecoration(
   floatingLabelStyle: TextStyle(
     color: Colors.purple[900]
   ),
+  suffixIconColor: MaterialStateColor.resolveWith((states) =>
+  states.contains(MaterialState.focused)
+      ? Colors.purple
+      : Colors.grey),
   focusedErrorBorder: OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(10)),
       borderSide: BorderSide(
