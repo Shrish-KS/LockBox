@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lockbox/screens/Authentication/register.dart';
 import 'package:lockbox/screens/Home/home.dart';
+import 'package:lockbox/screens/loading.dart';
 import 'package:lockbox/screens/onboarding/onboard.dart';
 import 'package:lockbox/shared/constants.dart';
 import 'package:lockbox/services/auth.dart';
@@ -22,10 +23,11 @@ class _SignInState extends State<SignIn> {
   String pass="";
   bool _passwordVisible =false;
   String error="";
+  bool loading=false;
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return loading?Loading():SafeArea(
       child: Scaffold(
         body: Container(
           alignment: Alignment.center,
@@ -45,13 +47,7 @@ class _SignInState extends State<SignIn> {
                   alignment: Alignment.bottomLeft,
                   child: Text(
                     "Welcome Back!",
-                    style: TextStyle(
-                      fontSize: 30,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.9,
-                      wordSpacing: 1
-                    ),
+                    style: authheadingtext,
                   ),
                 ),
                 Container(
@@ -120,39 +116,28 @@ class _SignInState extends State<SignIn> {
                           Container(
                             width: 150,
                             child: TextButton(
-                              style: ButtonStyle(
-                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0))),
-                                side: MaterialStatePropertyAll(BorderSide()),
-                                backgroundColor: MaterialStatePropertyAll(Color.fromRGBO(90, 1, 91, 1.0)),
-                                foregroundColor: MaterialStatePropertyAll(Colors.white),
-                                textStyle: MaterialStatePropertyAll(TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 0.7
-                                )),
-                              ),
+                              style: authbuttonstyle,
                                 onPressed: () async{
+                                setState(() {
+                                  loading=true;
+                                });
                                   if(_formkey.currentState!.validate()){
-                                    dynamic result=await _auth.signinwithemailpass(email,pass);
+                                    dynamic result=await _auth.signinwithemailpass(email,pass).whenComplete(() =>
+                                        setState(() {
+                                      loading=false;
+                                    }));
                                     if(result=="New email"){
-                                      QuickAlert.show(
-                                        context: context,
-                                        type: QuickAlertType.custom,
-                                        title: "Wrong Credentials",
-                                        widget: Text("This email is not registered with us. Do you want to register"),
-                                        showCancelBtn: true,
-                                        confirmBtnText: "Register",
-                                        confirmBtnColor: Color.fromRGBO(90, 1, 91, 1.0),
-                                        confirmBtnTextStyle: TextStyle(
-                                          color: Colors.white
-                                        ),
-                                        onConfirmBtnTap: (){
-                                          Navigator.pushReplacement(
+                                      alertdialog(context,"Wrong Credentials",Text("This email is not registered with us. Do you want to register"),true,"Register",
+                                        () {
+                                            Navigator.pushReplacement(
                                               context,
-                                            MaterialPageRoute(builder: (context) =>  Register()),
-                                          );
-                                        }
-                                      );
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      Register()),
+                                            );
+                                          }
+                                        );
+
                                     }
                                     else if(result is String){
                                       setState(() {
@@ -166,6 +151,9 @@ class _SignInState extends State<SignIn> {
                                       );
                                     }
                                   }
+                                setState(() {
+                                  loading=false;
+                                });
                                 },
                                 child: Text("Login")
                             ),
