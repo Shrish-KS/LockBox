@@ -145,7 +145,7 @@ class _SignInState extends State<SignIn> {
                                       });
                                     }
                                     else{
-                                      Navigator.push(
+                                      Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(builder: (context) =>  MainPage()),
                                       );

@@ -247,7 +247,7 @@ class _RegisterState extends State<Register> {
                                             alertdialog(context,"Enter Your Name",alertwidget,false,"Update",() {
                                             if (_formFieldKey.currentState!.validate()) {
                                             _auth.updatename(name, result);
-                                            Navigator.push(context, MaterialPageRoute(builder: (context) =>  MainPage()),);
+                                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  MainPage()),);
                                             }
                                             },
                                             customassets:'assets/namealert.png'
