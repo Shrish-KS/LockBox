@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lockbox/screens/Authentication/getstorageperm.dart';
 import 'package:lockbox/screens/Authentication/register.dart';
 import 'package:lockbox/screens/Home/home.dart';
 import 'package:lockbox/screens/loading.dart';
@@ -147,7 +148,7 @@ class _SignInState extends State<SignIn> {
                                     else{
                                       Navigator.pushReplacement(
                                         context,
-                                        MaterialPageRoute(builder: (context) =>  MainPage()),
+                                        MaterialPageRoute(builder: (context) =>  StoragePage()),
                                       );
                                     }
                                   }

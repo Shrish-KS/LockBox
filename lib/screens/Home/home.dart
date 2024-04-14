@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:lockbox/screens/Authentication/signin.dart';
 import 'package:lockbox/screens/Home/displayrepos.dart';
+import 'package:lockbox/screens/chat/chathome.dart';
 import 'package:lockbox/screens/localauth.dart';
 import 'package:lockbox/screens/pdfview.dart';
 import 'package:lockbox/services/auth.dart';
@@ -139,6 +140,12 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                           Navigator.push(context, MaterialPageRoute(builder: (context) => DisplayRepo("")),);
                         },
                         child: Text("Create folder"),
+                      ),
+                      TextButton(
+                          onPressed: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ChatMain()),);
+                          },
+                          child: Text("chat")
                       )
                     ],
                   )
@@ -212,7 +219,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
               onPressed: () {
                 print('Update the user info');
               },
-            )
+            ),
           ],
         ),
       ],

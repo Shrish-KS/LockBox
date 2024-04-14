@@ -9,6 +9,7 @@ class Authenticate{
   final FirebaseAuth _auth= FirebaseAuth.instance;
   final CollectionReference emaildata = FirebaseFirestore.instance.collection("email");
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  final CollectionReference frienddata = FirebaseFirestore.instance.collection("friends");
 
   Future signout() async {
     try {
@@ -58,7 +59,11 @@ class Authenticate{
       if(user !=null) {
         final SharedPreferences prefs = await _prefs;
         await prefs.setString('userin',user!.email??"");
-        emaildata.add({"email": user.email,"DOB":dob});
+        final uid = _auth.currentUser!.uid;
+        emaildata.doc(uid).set({"email": user.email,"DOB":dob});
+        frienddata.doc(uid).set({
+          "friends":[]
+        });
       }
       print(user);
       return user;
@@ -85,5 +90,30 @@ class Authenticate{
     return _auth.authStateChanges();
   }
 
-
+  Future addFriendlist(String friendemail) async{
+    if(_auth.currentUser!.email==friendemail){
+      return "";
+    }
+    List<QueryDocumentSnapshot> db=[];
+    await emaildata.where("email", isEqualTo: friendemail).get().then((value) =>
+    {
+      db=value.docs
+    });
+    if(db.isEmpty){
+      return "Entered email is not registered";
+    }
+    else{
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      Map data={"friends":Set()} as Map;
+      await frienddata.doc(uid).get().then((value) {
+        data=(value.data()??{"friends":Set()}) as Map;
+      });
+      data["friends"]=data["friends"]??Set();
+      data["friends"].add(db[0].id);
+      await frienddata.doc(uid).set({
+        "friends":Set().addAll(data["friends"])
+      });
+    }
+    return "";
+  }
 }

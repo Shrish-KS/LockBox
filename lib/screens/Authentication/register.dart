@@ -2,6 +2,7 @@ import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
+import 'package:lockbox/screens/Authentication/getstorageperm.dart';
 import 'package:lockbox/screens/Authentication/signin.dart';
 import 'package:lockbox/screens/Home/home.dart';
 import 'package:lockbox/screens/loading.dart';
@@ -247,7 +248,7 @@ class _RegisterState extends State<Register> {
                                             alertdialog(context,"Enter Your Name",alertwidget,false,"Update",() {
                                             if (_formFieldKey.currentState!.validate()) {
                                             _auth.updatename(name, result);
-                                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  MainPage()),);
+                                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  StoragePage()),);
                                             }
                                             },
                                             customassets:'assets/namealert.png'

@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lockbox/screens/Authentication/getstorageperm.dart';
 import 'package:lockbox/screens/Authentication/signin.dart';
 import 'package:lockbox/screens/Home/home.dart';
 import 'package:lockbox/screens/loading.dart';
 import 'package:lockbox/screens/onboarding/onboard.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:lockbox/screens/Home/notconnected.dart';
 
@@ -36,6 +38,15 @@ class _WrapperState extends State<Wrapper> {
     };
   }
 
+  void _checkperm() async {
+    if(await Permission.manageExternalStorage.isDenied){
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) =>  StoragePage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     getwidget();
@@ -45,6 +56,7 @@ class _WrapperState extends State<Wrapper> {
     }
     else{
       print(user.uid);
+      _checkperm();
       return MainPage();
     }
   }
