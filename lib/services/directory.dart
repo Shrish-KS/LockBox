@@ -43,7 +43,6 @@ Future uploadfolder(repo) async{
   await _prefs.then((SharedPreferences prefs) {
     user=prefs.getString("userin") ?? "";
   });
-  print(user);
   final dir = Directory((Platform.isAndroid
       ? await getExternalStorageDirectory() //FOR ANDROID
       : await getApplicationSupportDirectory() //FOR IOS
@@ -68,7 +67,6 @@ Future uploadfolder(repo) async{
         : await getApplicationSupportDirectory() //FOR IOS
     )!
         .path;
-    print(directory);
     file = (repo=="")?Directory("$directory/$user/").listSync():Directory(repo+"/").listSync();
 
     file.forEach((element) async{

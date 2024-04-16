@@ -5,11 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:lockbox/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Authenticate{
-  final FirebaseAuth _auth= FirebaseAuth.instance;
-  final CollectionReference emaildata = FirebaseFirestore.instance.collection("email");
+class Authenticate {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final CollectionReference emaildata = FirebaseFirestore.instance.collection(
+      "email");
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  final CollectionReference frienddata = FirebaseFirestore.instance.collection("friends");
+  final CollectionReference frienddata = FirebaseFirestore.instance.collection(
+      "friends");
+  final uid = FirebaseAuth.instance.currentUser!.uid;
 
   Future signout() async {
     try {
@@ -19,23 +22,25 @@ class Authenticate{
       await _auth.signOut();
       return;
     }
-    catch(e){
+    catch (e) {
       print(e);
       return e.toString();
     }
   }
 
-  Future signinwithemailpass(String email,String password) async{
+  Future signinwithemailpass(String email, String password) async {
     try {
-      final user = await _auth.signInWithEmailAndPassword(email: email, password: password);
-      if(user!=null){
+      final user = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      if (user != null) {
         final SharedPreferences prefs = await _prefs;
-        await prefs.setString('userin',user.user!.email??"");
+        await prefs.setString('userin', user.user!.email ?? "");
       }
       return user;
     }
-    catch(e){
-      if(e.toString()=="[firebase_auth/invalid-credential] The supplied auth credential is incorrect, malformed or has expired.") {
+    catch (e) {
+      if (e.toString() ==
+          "[firebase_auth/invalid-credential] The supplied auth credential is incorrect, malformed or has expired.") {
         bool newemail = true;
         await emaildata.where("email", isEqualTo: email).get().then((value) =>
         {
@@ -52,68 +57,107 @@ class Authenticate{
     }
   }
 
-  Future registerwithemailpass(String email,String password,DateTime dob) async{
-    try{
-      final result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      User? user=result.user;
-      if(user !=null) {
+  Future registerwithemailpass(String email, String password,
+      DateTime dob) async {
+    try {
+      final result = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      User? user = result.user;
+      if (user != null) {
         final SharedPreferences prefs = await _prefs;
-        await prefs.setString('userin',user!.email??"");
-        final uid = _auth.currentUser!.uid;
-        emaildata.doc(uid).set({"email": user.email,"DOB":dob});
+        await prefs.setString('userin', user!.email ?? "");
+        emaildata.doc(uid).set({"email": user.email, "DOB": dob});
         frienddata.doc(uid).set({
-          "friends":[]
+          "friends": []
         });
       }
       print(user);
       return user;
     }
-    catch(e){
+    catch (e) {
       print(e.toString());
-      if(e.toString()=="[firebase_auth/email-already-in-use] The email address is already in use by another account."){
+      if (e.toString() ==
+          "[firebase_auth/email-already-in-use] The email address is already in use by another account.") {
         return "Old Email";
       }
       return e.toString();
     }
   }
 
-  Future updatename(String name,User? user) async{
+  Future updatename(String name, User? user) async {
     try {
       await user!.updateDisplayName(name);
       return name;
     }
-    catch(e){
+    catch (e) {
       return e.toString();
     }
   }
-  Stream<User?> get user{
+
+  Stream<User?> get user {
     return _auth.authStateChanges();
   }
 
-  Future addFriendlist(String friendemail) async{
-    if(_auth.currentUser!.email==friendemail){
-      return "";
+  Future addFriendlist(String friendemail) async {
+    if (_auth.currentUser!.email == friendemail) {
+      return "You can't add yourself";
     }
-    List<QueryDocumentSnapshot> db=[];
+    List<QueryDocumentSnapshot> db = [];
     await emaildata.where("email", isEqualTo: friendemail).get().then((value) =>
     {
-      db=value.docs
+      db = value.docs
     });
-    if(db.isEmpty){
+    if (db.isEmpty) {
       return "Entered email is not registered";
     }
-    else{
-      final uid = FirebaseAuth.instance.currentUser!.uid;
-      Map data={"friends":Set()} as Map;
+    else {
+      Map data = {"friends": [], "bothadded": [], "otheradded": []} as Map;
       await frienddata.doc(uid).get().then((value) {
-        data=(value.data()??{"friends":Set()}) as Map;
+        data = (value.data() ??
+            {"friends": [], "bothadded": [], "otheradded": []}) as Map;
       });
-      data["friends"]=data["friends"]??Set();
-      data["friends"].add(db[0].id);
+      if (data["bothadded"] != null && data["bothadded"].contains(db[0].id)) {
+        return "Friend Already added";
+      }
+      else if (data["friends"] != null && data["friends"].contains(db[0].id)) {
+        return "You have added already the friend";
+      }
+      else
+      if (data["otheradded"] != null && data["otheradded"].contains(db[0].id)) {
+        data["otheradded"].removeWhere((item) => item == db[0].id);
+        data["bothadded"].add(db[0].id);
+      }
+      else {
+        data["friends"] = data["friends"];
+        data["friends"].add(db[0].id);
+      }
       await frienddata.doc(uid).set({
-        "friends":Set().addAll(data["friends"])
+        "friends": data["friends"],
+        "bothadded": data["bothadded"],
+        "otheradded": data["otheradded"]
       });
     }
     return "";
   }
+
+  List<ChatFriends> converttouid(DocumentSnapshot snap){
+    try {
+      return (snap.data() as Map)!["bothadded"]!.forEach((val) {
+        return ChatFriends(val);
+      }).toList();
+    }
+    catch(e){
+      print(e);
+      return [];
+    }
+  }
+
+  Stream<List<ChatFriends>> get friends{
+    return frienddata.doc(uid).snapshots().map(converttouid);
+  }
+}
+
+class ChatFriends{
+  String uid="";
+  ChatFriends(this.uid);
 }

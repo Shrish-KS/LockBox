@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lockbox/screens/chat/chatlist.dart';
 import 'package:lockbox/shared/constants.dart';
 import 'package:lockbox/services/auth.dart';
+import 'package:provider/provider.dart';
 
 class ChatMain extends StatefulWidget {
   const ChatMain({super.key});
@@ -17,12 +19,19 @@ class _ChatMainState extends State<ChatMain> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Chatpage"),),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _displayDialog(context);
-        },
+    return StreamProvider.value(
+      initialData: null,
+      value: Authenticate().friends,
+      child: Scaffold(
+        appBar: AppBar(title: Text("Chatpage"),),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            _displayDialog(context);
+          },
+        ),
+        body: Container(
+        child: ChatList()
+        ),
       ),
     );
   }
@@ -76,7 +85,7 @@ class _ChatMainState extends State<ChatMain> {
                 onChanged: (val){
                   name=val;
                 },
-                validator: (val)=>(val=="")?"Email can't be empty": ((result=="")?null:"Email is Not registered"),
+                validator: (val)=>(val=="")?"Email can't be empty": ((result=="")?null:result),
               ),
             )
         ),
