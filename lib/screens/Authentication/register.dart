@@ -201,7 +201,7 @@ class _RegisterState extends State<Register> {
                                             error="";
                                             loading=true;
                                           });
-                                          dynamic result = await _auth.registerwithemailpass(email,pass,dob);
+                                          dynamic result = await _auth.registerwithemailpass(email,pass,dob,phone);
                                           if(result=="Old Email"){
                                             setState(() {
                                               loading=false;

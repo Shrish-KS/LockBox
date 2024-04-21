@@ -18,6 +18,7 @@ class _ChatMainState extends State<ChatMain> {
   String result="";
 
   @override
+
   Widget build(BuildContext context) {
     return StreamProvider.value(
       initialData: null,

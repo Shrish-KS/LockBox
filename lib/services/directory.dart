@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -43,14 +45,6 @@ Future uploadfolder(repo) async{
   await _prefs.then((SharedPreferences prefs) {
     user=prefs.getString("userin") ?? "";
   });
-  final dir = Directory((Platform.isAndroid
-      ? await getExternalStorageDirectory() //FOR ANDROID
-      : await getApplicationSupportDirectory() //FOR IOS
-  )!
-      .path + '/$user/');
-  print(dir);
-
-
   FirebaseStorage _storage = FirebaseStorage.instance;
   List file;
 
@@ -60,21 +54,21 @@ Future uploadfolder(repo) async{
       file=["Storage access not granted"];
       return ;
     }
-
-
+    final uid=FirebaseAuth.instance.currentUser!.uid;
     String directory = (Platform.isAndroid
         ? await getExternalStorageDirectory() //FOR ANDROID
         : await getApplicationSupportDirectory() //FOR IOS
     )!
         .path;
     file = (repo=="")?Directory("$directory/$user/").listSync():Directory(repo+"/").listSync();
+    CollectionReference curstore=FirebaseFirestore.instance.collection("shareddata").doc(uid).collection("Uploadedfiles");
+    var docid;
+    await curstore.add({"name":"${basename(repo)}"}).then((doc) => docid=doc.id);
+    Reference reference = (repo=="")?_storage.ref().child("$uid/"):_storage.ref().child("$uid/$docid/");
 
     file.forEach((element) async{
       File file=File(element.path);
-      Reference reference = (repo=="")?_storage.ref().child("$user/"):_storage.ref().child("$user/${basename(repo)}/");
       UploadTask uploadTask = reference.child("${basename(file.path)}").putFile(file);
-      String location = await (await uploadTask).ref.getDownloadURL();
-      print(location);
     });
 
   }

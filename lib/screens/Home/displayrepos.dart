@@ -67,7 +67,6 @@ class _DisplayRepoState extends State<DisplayRepo> {
 
   allfiles(repo) async{
     FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.custom,allowedExtensions: ["pdf"]);
-
     if (result != null) {
       File files = File(result.files.single.path!);
       files.copy("${widget.repo}/${basename(files.path)}");

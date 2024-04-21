@@ -25,13 +25,11 @@ class _WrapperState extends State<Wrapper> {
     try {
       final result = await InternetAddress.lookup('example.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        print('connected');
         setState(() {
           status=true;
         });
       }
     }catch (_) {
-      print('not connected');
       setState(() {
         status=false;
       });
@@ -55,7 +53,6 @@ class _WrapperState extends State<Wrapper> {
       return status?Onboard():NotConnected();
     }
     else{
-      print(user.uid);
       _checkperm();
       return MainPage();
     }

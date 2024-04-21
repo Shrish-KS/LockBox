@@ -28,17 +28,18 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   String name="";
   String extpath="";
 
-  void initState() {
+  void initState(){
     super.initState();
     check.getAvailableBiometrics();
     WidgetsBinding.instance.addObserver(this);
     if (WidgetsBinding.instance.lifecycleState != null) {
       curstate=WidgetsBinding.instance.lifecycleState!;
     }
-    _prefs.then((SharedPreferences prefs) {
+    _prefs.then((SharedPreferences prefs) async{
       setState(() {
         user=prefs.getString("userin") ?? "";
       });
+      await createFolder(user);
     });
   }
 
@@ -100,7 +101,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
       body: Center(
           child: Column(
             children: [
-              Text(curstate.toString()+user+name+extpath),
+              Text(curstate.toString()+user+name),
               Form(
                   child: Column(
                     children: [
@@ -119,17 +120,6 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
                             }
                           },
                           child: Text("Enter")
-                      ),
-                      TextButton(
-                          onPressed: () async{
-                            String result=await createFolder(user);
-                            if(result!=null){
-                              setState(() {
-                                extpath=result;
-                              });
-                            }
-                          },
-                          child: Text("EEEEEE")
                       ),
                       TextButton(
                           onPressed: _displayDialog,

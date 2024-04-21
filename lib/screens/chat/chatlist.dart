@@ -15,7 +15,7 @@ class _ChatListState extends State<ChatList> {
   @override
   Widget build(BuildContext context) {
     final chats = Provider.of<List<ChatFriends>?>(context)??[];
-
+    print(chats);
     return Container(
       child: ListView.builder(
           itemCount: chats.length,

@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
+    print("ewd");
     return StreamProvider<User?>.value(
         initialData: null,
         value: Authenticate().user,
